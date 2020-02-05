@@ -1,9 +1,14 @@
-import React from 'react';
-import store from '../store';
+import React from "react";
+import store, {
+  rowCreatorFunc,
+  colorCreatorFunc,
+  drawCreatorFunc
+} from "../store";
+import Table from "./Table.jsx";
 
 export default class App extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = store.getState();
   }
 
@@ -15,14 +20,28 @@ export default class App extends React.Component {
     this.unsubscribe();
   }
 
-  render() {
+  addRow() {
+    store.dispatch(rowCreatorFunc());
+  }
 
+  handleColorChange(event) {
+    const newColor = event.target.value;
+    store.dispatch(colorCreatorFunc(newColor));
+  }
+
+  handleDraw(event, rowIdx, colIdx) {
+    store.dispatch(drawCreatorFunc(rowIdx, colIdx));
+  }
+
+  render() {
     return (
       <div id="pixelate">
         <h1>Pixelate</h1>
         <div>
-          <button id='add-row'>Add a row</button>
-          <select>
+          <button id="add-row" onClick={this.addRow}>
+            Add a row
+          </button>
+          <select onChange={() => this.handleColorChange(event)}>
             <option value="red">Red</option>
             <option value="orange">Orange</option>
             <option value="yellow">Yellow</option>
@@ -35,9 +54,8 @@ export default class App extends React.Component {
             <option value="brown">Brown</option>
           </select>
         </div>
-        <table>
-        </table>
+        <Table grid={store.getState().grid} handleDraw={this.handleDraw} />
       </div>
-    )
+    );
   }
 }
